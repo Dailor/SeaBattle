@@ -9,6 +9,7 @@ import json
 
 def errors_handler(func):
     """Декоратор, вызывающий диалоговое окно с исключением при исключениях"""
+
     def wrapper(self):
         try:
             func(self)
@@ -33,14 +34,14 @@ class SeeBattle_Auth(QMainWindow):
 
         super().__init__()
 
-        self.uic_auth = self.client_path + '\\ui files\\auth_form.ui'
+        self.uic_auth = os.path.join(self.client_path, 'ui files', 'auth_form.ui')
         uic.loadUi(self.uic_auth, self)
 
         self.network = False
 
         self.widget_functions()
 
-        with open(self.client_path + '\\settings\\checker_ip.inf', 'r') as f:
+        with open(os.path.join(self.client_path, 'settings', 'checker_ip.inf'), 'r') as f:
             data = [line.split()[1] for line in f.read().split('\n')]
             self.checkers_ip, self.checkers_port = data
         self.checkers_port = int(self.checkers_port)
@@ -121,7 +122,7 @@ class Sign_up(QMainWindow):
 
         self.client_path = os.getcwd().rsplit("\\", maxsplit=1)[0]
 
-        self.uic_sign_up = self.client_path + '\\ui files\\sign_up.ui'
+        self.uic_sign_up = os.path.join(self.client_path, 'ui files', 'sign_up.ui')
         uic.loadUi(self.uic_sign_up, self)
 
         self.btn_su.clicked.connect(self.sign_up)
@@ -152,7 +153,6 @@ class Sign_up(QMainWindow):
             self.network = Client()
         result = self.network.command_send(f"sign_up?login={login}&password={password}&secret={secret}").split('?')
 
-        
         if len(result) == 1:
             result = result[0]
             self.auth_form = SeeBattle_Auth(self)
@@ -164,7 +164,6 @@ class Sign_up(QMainWindow):
             msg.show()
             return True
         return self.my_errors(result[1])
-            
 
     def mousePressEvent(self, event):
         x, y = event.x(), event.y()
@@ -182,7 +181,7 @@ class Password_rec(QDialog):
         super().__init__()
 
         self.client_path = os.getcwd().rsplit("\\", maxsplit=1)[0]
-        self.uic_auth = self.client_path + "\\ui files\\pass_rec.ui"
+        self.uic_auth = os.path.join(self.client_path, "ui files", "pass_rec.ui")
         uic.loadUi(self.uic_auth, self)
 
         self.network = False
@@ -224,6 +223,7 @@ class Password_rec(QDialog):
 
 class Game_menu(QMainWindow):
     """игровое меню"""
+
     def __init__(self, data, pre, login=None):
         try:
             self.main_network = pre.network
@@ -240,7 +240,7 @@ class Game_menu(QMainWindow):
             self.get_info_acc(login)
 
         self.client_path = os.getcwd().rsplit("\\", maxsplit=1)[0]
-        self.uic_auth = self.client_path + "\\ui files\\main_menu.ui"
+        self.uic_auth = os.path.join(self.client_path, "ui files", "main_menu.ui")
         uic.loadUi(self.uic_auth, self)
 
         self.main_menu_labels()
@@ -248,7 +248,7 @@ class Game_menu(QMainWindow):
 
     def get_info_acc(self, login=None):
         # вывод в UI данные пользователя
-        if login is  None:
+        if login is None:
             login = self.user_info["login"]
         data = self.main_network.command_send(f"get_info?login={login}").split('&')
         self.user_info = dict(
@@ -320,6 +320,7 @@ class Ask_to_server(QThread):
 
 class Ship_replace(QMainWindow):
     """тут кораблики расстанавливаем"""
+
     def __init__(self, pre, ip, port):
         super().__init__()
         self.server_ = ip, port,
@@ -332,7 +333,7 @@ class Ship_replace(QMainWindow):
 
         self.client_path = os.getcwd().rsplit("\\", maxsplit=1)[0]
 
-        uic.loadUi(self.client_path + r'\ui files\replace_field.ui', self)
+        uic.loadUi(os.path.join(self.client_path, 'ui files', 'replace_field.ui'), self)
 
         self.battle_field = [['.' for _ in range(10)] for __ in range(10)]
         self.count_ships = {1: 4, 2: 3, 3: 2, 4: 1}
@@ -393,7 +394,7 @@ class Ship_replace(QMainWindow):
                 self.battle_arena.show()
                 self.close()
             elif '2nd player left' in data:
-                self.main_menu = Game_menu(None, self, login= self.main_menu.user_info['login'])
+                self.main_menu = Game_menu(None, self, login=self.main_menu.user_info['login'])
                 self.main_menu.show()
                 self.close()
                 msg = QMessageBox(self.main_menu)
@@ -558,6 +559,7 @@ class Ship_replace(QMainWindow):
 
 class Battle_2v2(QMainWindow):
     """Экран сражения"""
+
     def __init__(self, pre, first, enemy):
         super().__init__()
         self.previous_class = pre
@@ -567,7 +569,7 @@ class Battle_2v2(QMainWindow):
 
         self.client_path = os.getcwd().rsplit("\\", maxsplit=1)[0]
 
-        uic.loadUi(self.client_path + r"\ui files\battle_fields.ui", self)
+        uic.loadUi(os.path.join(self.client_path, "ui files", "battle_fields.ui"), self)
 
         self.label_2.setText(f'Enemy {enemy}')
 
@@ -688,9 +690,9 @@ class Battle_2v2(QMainWindow):
 
                 if tuple(data['move']) == self.main_network.getsockname():
                     self.unblock_btns()
-                    self.label_turn.setText( 'You')
+                    self.label_turn.setText('You')
                 else:
-                    self.label_turn.setText( 'Enemy')
+                    self.label_turn.setText('Enemy')
                     if data['won'] == None:
                         self.thread_.start()
                     self.block_btns()

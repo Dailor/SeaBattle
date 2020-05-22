@@ -17,7 +17,7 @@ class Check_alive(socket.socket, threading.Thread):
 
         self.server_port = self.getsockname()[1]
 
-        with open(self.clients_path + '\\settings\\checker_ip.inf', 'w') as f:
+        with open(os.path.join(self.clients_path, 'settings', 'checker_ip.inf'), 'w') as f:
             f.write(f'ip {self.server_ip}\n')
             f.write(f'port {self.server_port}')
 

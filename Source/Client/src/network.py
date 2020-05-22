@@ -8,7 +8,7 @@ class Client(socket.socket):
         super().__init__(socket.AF_INET, socket.SOCK_DGRAM)
 
         self.client_path = os.getcwd().rsplit("\\", maxsplit=1)[0]
-        settings_inf = self.client_path + '\\settings\\settings.inf'
+        settings_inf = os.path.join(self.client_path, 'settings', 'settings.inf')
         if ip is None and port is None:
             with open(settings_inf) as f:
                 self.main_server = [line.replace("\n", '').split()[1] for line in f.readlines()]
